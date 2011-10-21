@@ -36,14 +36,14 @@
     CCHmacInit(&hmacContext, kCCHmacAlgSHA1, secretData.bytes, secretData.length);
     CCHmacUpdate(&hmacContext, textData.bytes, textData.length);
     CCHmacFinal(&hmacContext, result);
-	
+
 	//Base64 Encoding
 	char base64Result[32];
 	size_t theResultLength = 32;
 	Base64EncodeData(result, 20, base64Result, &theResultLength);
 	NSData *theData = [NSData dataWithBytes:base64Result length:theResultLength];
 	NSString *base64EncodedResult = [[[NSString alloc] initWithData:theData encoding:NSUTF8StringEncoding] autorelease];
-	
+
 	return base64EncodedResult;
 }
 
@@ -60,7 +60,7 @@
 		self = nil;
 		[NSException raise:@"Unsupported Signature Method" format:@"The signature method \"%@\" is not currently support by MPOAuthConnection", inMethod];
 	}
-	
+
 	return self;
 }
 
@@ -71,7 +71,7 @@
 		self.name = @"oauth_signature";
 		self.value = [MPOAuthSignatureParameter HMAC_SHA1SignatureForText:signatureBaseString usingSecret:inSecret];
 	}
-	return self;	
+	return self;
 }
 
 - (oneway void)dealloc {

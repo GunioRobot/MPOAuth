@@ -43,7 +43,7 @@
 	self.HTTPMethod = nil;
 	self.urlRequest = nil;
 	self.parameters = nil;
-	
+
 	[super dealloc];
 }
 
@@ -70,11 +70,11 @@
 	NSString *version = [[paramsDict objectForKey:@"oauth_version"] stringByAddingURIPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	NSString *method = [[paramsDict objectForKey:@"oauth_signature_method"] stringByAddingURIPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	NSString *fullAuthString = nil;
-	
+
 	if (token) {
 		fullAuthString = [NSString stringWithFormat:@"OAuth oauth_token=\"%@\",oauth_consumer_key=\"%@\",oauth_version=\"%@\",oauth_signature_method=\"%@\", oauth_timestamp=\"%@\",oauth_nonce=\"%@\",oauth_signature=\"%@\"", token, consumerKey, version, method, timeStamp, nonce, signature];
 	} else {
-		fullAuthString = [NSString stringWithFormat:@"OAuth oauth_consumer_key=\"%@\",oauth_version=\"%@\",oauth_signature_method=\"%@\", oauth_timestamp=\"%@\",oauth_nonce=\"%@\",oauth_signature=\"%@\"", consumerKey, version, method, timeStamp, nonce, signature];		
+		fullAuthString = [NSString stringWithFormat:@"OAuth oauth_consumer_key=\"%@\",oauth_version=\"%@\",oauth_signature_method=\"%@\", oauth_timestamp=\"%@\",oauth_nonce=\"%@\",oauth_signature=\"%@\"", consumerKey, version, method, timeStamp, nonce, signature];
 	}
 
 	return fullAuthString;
@@ -87,14 +87,14 @@
 	if (!aRequest ) {
 		aRequest = [[NSMutableURLRequest alloc] init];
 	}
-	
+
 	NSString *urlString = nil;
 	NSMutableString *parameterString = [[NSMutableString alloc] initWithString:[MPURLRequestParameter parameterStringForParameters:self.parameters]];
 	MPOAuthSignatureParameter *signatureParameter = [[MPOAuthSignatureParameter alloc] initWithText:parameterString andSecret:inSecret forRequest:self usingMethod:inScheme];
 
 	[parameterString appendFormat:@"&%@", [signatureParameter URLEncodedParameterString]];
 	[aRequest setHTTPMethod:self.HTTPMethod];
-	
+
 	if ([[self HTTPMethod] isEqualToString:@"GET"] && [self.parameters count]) {
 		urlString = [NSString stringWithFormat:@"%@?%@", [self.url absoluteString], parameterString];
 	} else if  ([[self HTTPMethod] isEqualToString:@"POST"]) {
@@ -108,7 +108,7 @@
 			NSString *postDataString = [MPURLRequestParameter parameterStringForParameters:nonOauthParameters];
 			NSData *postData = [postDataString dataUsingEncoding:NSUTF8StringEncoding];
 			MPLog(@"postDataString - %@", postDataString);
-			
+
 			[aRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
 			[aRequest setValue:[NSString stringWithFormat:@"%d", [postData length]] forHTTPHeaderField:@"Content-Length"];
 			[aRequest setHTTPBody:postData];
@@ -120,11 +120,11 @@
 	MPLog( @"urlString - %@", urlString);
 	[aRequest setURL:[NSURL URLWithString:urlString]];
 	self.urlRequest = aRequest;
-	
+
 	[parameterString release];
 	[signatureParameter release];
 	[aRequest release];
-	
+
 	return aRequest;
 }
 

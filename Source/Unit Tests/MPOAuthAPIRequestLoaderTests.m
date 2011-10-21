@@ -19,13 +19,13 @@
 - (void)setUp {
 	NSString *currentDir = [[NSFileManager defaultManager] currentDirectoryPath];
     NSString *serverPath = [currentDir stringByAppendingPathComponent:@"Source/Unit Tests/OATestServer.rb"];
-    
+
     server = [[NSTask alloc] init];
     [server setArguments:[NSArray arrayWithObject:serverPath]];
     [server setLaunchPath:@"/usr/bin/ruby"];
     [server launch];
     sleep(2); // let the server get ready to respond
-	
+
 //	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(accessTokenReceived:) name:MPOAuthNotificationAccessTokenReceived object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestTokenReceived:) name:MPOAuthNotificationRequestTokenReceived object:nil];
 }
@@ -41,7 +41,7 @@
 	NSURL *url = [NSURL URLWithString:@"http://localhost:4567/request_token"];
 	MPOAuthCredentialConcreteStore *credentialStore = [[MPOAuthCredentialConcreteStore alloc] initWithCredentials:credentials forBaseURL:url withAuthenticationURL:url];
 	credentialStore.signatureMethod = @"PLAINTEXT";
-	
+
 	MPOAuthURLRequest *urlRequest = [[MPOAuthURLRequest alloc] initWithURL:url andParameters:nil];
 	[urlRequest setHTTPMethod:@"POST"];
 	MPOAuthAPIRequestLoader *requestLoader = [[MPOAuthAPIRequestLoader alloc] initWithRequest:urlRequest];
@@ -52,13 +52,13 @@
 - (void)requestTokenReceived:(NSNotification *)inNotification {
 	NSString *token = [[inNotification userInfo] objectForKey:@"oauth_token"];
 	NSString *tokenSecret = [[inNotification userInfo] objectForKey:@"oauth_token_secret"];
-	
+
 	STAssertEqualObjects(token, @"nnch734d00sl2jdk", @"Expected Token Not Found");
     STAssertEqualObjects(tokenSecret, @"pfkkdhi9sl3r4s00", @"Expected Token Secret Not Found");
 }
 
 //- (void)accessTokenReceived:(NSNotification *)inNotification {
-//	
+//
 //}
 
 @end

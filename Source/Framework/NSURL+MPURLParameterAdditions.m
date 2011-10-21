@@ -17,15 +17,15 @@
 	NSString *queryString = [self query];
 	NSString *absoluteString = [self absoluteString];
 	NSRange parameterRange = [absoluteString rangeOfString:@"?"];
-	
+
 	if (parameterRange.location != NSNotFound) {
 		parameterRange.length = [absoluteString length] - parameterRange.location;
 		[parameters addObjectsFromArray:[MPURLRequestParameter parametersFromString:queryString]];
 		absoluteString = [absoluteString substringToIndex:parameterRange.location];
 	}
-	
+
 	[parameters addObjectsFromArray:inParameters];
-	
+
 	return [NSURL URLWithString:[NSString stringWithFormat:@"%@?%@", absoluteString, [MPURLRequestParameter parameterStringForParameters:[parameters autorelease]]]];
 }
 
@@ -35,18 +35,18 @@
 	NSString *absoluteString = [self absoluteString];
 	NSRange parameterRange = [absoluteString rangeOfString:@"?"];
 	NSURL *composedURL = self;
-	
+
 	if (parameterRange.location != NSNotFound) {
 		parameterRange.length = [absoluteString length] - parameterRange.location;
-		
+
 		//[parameterDictionary addEntriesFromDictionary:inParameterDictionary];
 		[parameterDictionary addEntriesFromDictionary:[MPURLRequestParameter parameterDictionaryFromString:queryString]];
-		
+
 		composedURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@?%@", [absoluteString substringToIndex:parameterRange.location], [MPURLRequestParameter parameterStringForDictionary:parameterDictionary]]];
 	} else if ([parameterDictionary count]) {
 		composedURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@?%@", absoluteString, [MPURLRequestParameter parameterStringForDictionary:parameterDictionary]]];
 	}
-	
+
 	[parameterDictionary release];
 
 	return composedURL;
@@ -56,12 +56,12 @@
 	NSURL *composedURL = self;
 	NSString *absoluteString = [self absoluteString];
 	NSRange queryRange = [absoluteString rangeOfString:@"?"];
-	
+
 	if (queryRange.location != NSNotFound) {
 		NSString *urlSansQuery = [absoluteString substringToIndex:queryRange.location];
 		composedURL = [NSURL URLWithString:urlSansQuery];
 	}
-	
+
 	return composedURL;
 }
 
@@ -71,19 +71,19 @@
 	if ([[self path] length] == 0 && [[self query] length] == 0) {
 		normalizedString = [NSString stringWithFormat:@"%@/", [self absoluteString]];
 	}
-	
+
 	return normalizedString;
 }
 
 - (BOOL)domainMatches:(NSString *)inString {
 	BOOL matches = NO;
-	
+
 	NSString *domain = [self host];
 	matches = [domain isIPAddress] && [domain isEqualToString:inString];
-	
+
 	int domainLength = [domain length];
 	int requestedDomainLength = [inString length];
-	
+
 	if (!matches) {
 		if (domainLength > requestedDomainLength) {
 			matches = [domain rangeOfString:inString].location == (domainLength - requestedDomainLength);
@@ -91,7 +91,7 @@
 			matches = ([inString compare:domain options:NSCaseInsensitiveSearch range:NSMakeRange(1, domainLength)] == NSOrderedSame);
 		}
 	}
-	
+
 	return matches;
 }
 

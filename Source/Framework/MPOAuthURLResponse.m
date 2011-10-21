@@ -17,7 +17,7 @@
 
 - (id)init {
 	if ((self = [super init])) {
-		
+
 	}
 	return self;
 }
@@ -25,7 +25,7 @@
 - (oneway void)dealloc {
 	self.urlResponse = nil;
 	self.oauthParameters = nil;
-	
+
 	[super dealloc];
 }
 

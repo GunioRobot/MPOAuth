@@ -14,7 +14,7 @@
 - (BOOL)isIPAddress {
 	BOOL isIPAddress = NO;
 	NSArray *components = [self componentsSeparatedByString:@"."];
-	NSCharacterSet *invalidCharacters = [[NSCharacterSet characterSetWithCharactersInString:@"1234567890"] invertedSet]; 
+	NSCharacterSet *invalidCharacters = [[NSCharacterSet characterSetWithCharactersInString:@"1234567890"] invertedSet];
 
 	if ([components count] == 4) {
 		NSString *part1 = [components objectAtIndex:0];
@@ -35,7 +35,7 @@
 			}
 		}
 	}
-	
+
 	return isIPAddress;
 }
 
@@ -45,7 +45,7 @@
 																				  NULL,
 																				  (CFStringRef)@":/?=,!$&'()*+;[]@#",
 																				  CFStringConvertNSStringEncodingToEncoding(inEncoding));
-	
+
 	return [escapedString autorelease];
 }
 

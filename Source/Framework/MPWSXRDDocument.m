@@ -39,7 +39,7 @@
 	self.subject = nil;
 	self.expirationDate = nil;
 	self.urlRelationships = nil;
-	
+
 	[super dealloc];
 }
 
@@ -51,7 +51,7 @@
 
 - (BOOL)_parseStringForContent:(NSString *)inString {
 	BOOL successfullyParsed = NO;
-	
+
 	xmlInitParser();
 	const char *cStringForDoc = [inString UTF8String];
 	xmlDocPtr xrdDocument = xmlParseMemory(cStringForDoc, strlen(cStringForDoc));
@@ -59,30 +59,30 @@
 //		xmlNodePtr rootNode = xmlDocGetRootElement(xrdDocument);
 		xmlXPathContextPtr xpathContext = xmlXPathNewContext(xrdDocument);
 		xmlXPathObjectPtr xpathObject = NULL;
-		
+
 		xpathObject = xmlXPathEvalExpression((const xmlChar *)"/xrd[0]/subject", xpathContext);
 		if (xpathObject) {
 			xmlNodeSetPtr subjectNodes = xpathObject->nodesetval;
 			int resultsCount = subjectNodes ? subjectNodes->nodeNr : 0;
 			int i = 0;
-			
+
 			for ( ; i < resultsCount; i++) {
-				
+
 			}
 		}
 		xmlXPathFreeObject(xpathObject);
-		
+
 		xmlXPathFreeContext(xpathContext);
 		xmlFreeDoc(xrdDocument);
 	}
 	xmlCleanupParser();
-	
+
 	return successfullyParsed;
 }
 
 - (NSURL *)urlForRelationship:(NSString *)inRelationshipType {
 	NSURL *foundURL = [self.urlRelationships objectForKey:inRelationshipType];
-	
+
 	return foundURL;
 }
 

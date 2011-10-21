@@ -49,7 +49,7 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 }
 
 - (id)initWithCredentials:(NSDictionary *)inCredentials authenticationURL:(NSURL *)inAuthURL andBaseURL:(NSURL *)inBaseURL {
-	return [self initWithCredentials:inCredentials authenticationURL:inBaseURL andBaseURL:inBaseURL autoStart:YES];	
+	return [self initWithCredentials:inCredentials authenticationURL:inBaseURL andBaseURL:inBaseURL autoStart:YES];
 }
 
 - (id)initWithCredentials:(NSDictionary *)inCredentials authenticationURL:(NSURL *)inAuthURL andBaseURL:(NSURL *)inBaseURL autoStart:(BOOL)aFlag {
@@ -62,12 +62,12 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 		self.signatureScheme = MPOAuthSignatureSchemeHMACSHA1;
 
 		activeLoaders_ = [[NSMutableArray alloc] initWithCapacity:10];
-		
+
 		if (aFlag) {
 			[self authenticate];
 		}
 	}
-	return self;	
+	return self;
 }
 
 - (id)initWithCredentials:(NSDictionary *)inCredentials withConfiguration:(NSDictionary *)inConfiguration autoStart:(BOOL)aFlag {
@@ -76,16 +76,16 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 		self.baseURL = [inConfiguration valueForKey:MPOAuthBaseURLKey];
 		self.authenticationState = MPOAuthAuthenticationStateUnauthenticated;
 		credentials_ = [[MPOAuthCredentialConcreteStore alloc] initWithCredentials:inCredentials forBaseURL:self.baseURL withAuthenticationURL:self.authenticationURL];
-		self.authenticationMethod = [[MPOAuthAuthenticationMethod alloc] initWithAPI:self forURL:self.authenticationURL withConfiguration:inConfiguration];				
+		self.authenticationMethod = [[MPOAuthAuthenticationMethod alloc] initWithAPI:self forURL:self.authenticationURL withConfiguration:inConfiguration];
 		self.signatureScheme = MPOAuthSignatureSchemeHMACSHA1;
-		
+
 		activeLoaders_ = [[NSMutableArray alloc] initWithCapacity:10];
-		
+
 		if (aFlag) {
 			[self authenticate];
 		}
 	}
-	return self;	
+	return self;
 }
 
 - (oneway void)dealloc {
@@ -94,7 +94,7 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 	self.authenticationURL = nil;
 	self.authenticationMethod = nil;
 	self.activeLoaders = nil;
-	
+
 	[super dealloc];
 }
 
@@ -110,9 +110,9 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 
 - (void)setSignatureScheme:(MPOAuthSignatureScheme)inScheme {
 	signatureScheme_ = inScheme;
-	
+
 	NSString *methodString = @"HMAC-SHA1";
-	
+
 	switch (signatureScheme_) {
 		case MPOAuthSignatureSchemePlainText:
 			methodString = @"PLAINTEXT";
@@ -124,7 +124,7 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 			// already initted to the default
 			break;
 	}
-	
+
 	[(MPOAuthCredentialConcreteStore *)credentials_ setSignatureMethod:methodString];
 }
 
@@ -165,19 +165,19 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 	if (!inMethod && ![inURL path] && ![inURL query]) {
 		[NSException raise:@"MPOAuthNilMethodRequestException" format:@"Nil was passed as the method to be performed on %@", inURL];
 	}
-	
+
 	NSURL *requestURL = inMethod ? [NSURL URLWithString:inMethod relativeToURL:inURL] : inURL;
 	MPOAuthURLRequest *aRequest = [[MPOAuthURLRequest alloc] initWithURL:requestURL andParameters:inParameters];
 	MPOAuthAPIRequestLoader *loader = [[MPOAuthAPIRequestLoader alloc] initWithRequest:aRequest];
-	
+
 	aRequest.HTTPMethod = inHTTPMethod;
 	loader.credentials = self.credentials;
 	loader.target = inTarget;
 	loader.action = inAction ? inAction : @selector(_performedLoad:receivingData:);
-	
+
 	[loader loadSynchronously:NO];
 	//	[self.activeLoaders addObject:loader];
-	
+
 	[loader release];
 	[aRequest release];
 }
@@ -189,16 +189,16 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 
 	MPOAuthURLRequest *aRequest = [[MPOAuthURLRequest alloc] initWithURLRequest:inRequest];
 	MPOAuthAPIRequestLoader *loader = [[MPOAuthAPIRequestLoader alloc] initWithRequest:aRequest];
-	
+
 	loader.credentials = self.credentials;
 	loader.target = inTarget;
 	loader.action = inAction ? inAction : @selector(_performedLoad:receivingData:);
-	
+
 	[loader loadSynchronously:NO];
 	//	[self.activeLoaders addObject:loader];
-	
+
 	[loader release];
-	[aRequest release];	
+	[aRequest release];
 }
 
 - (NSData *)dataForMethod:(NSString *)inMethod {
@@ -216,10 +216,10 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 
 	loader.credentials = self.credentials;
 	[loader loadSynchronously:YES];
-	
+
 	[loader autorelease];
 	[aRequest release];
-	
+
 	return loader.data;
 }
 
@@ -239,7 +239,7 @@ NSString * const MPOAuthAuthenticationURLKey		= @"MPOAuthAuthenticationURL";
 
 - (void)discardCredentials {
 	[self.credentials discardOAuthCredentials];
-	
+
 	self.authenticationState = MPOAuthAuthenticationStateUnauthenticated;
 }
 

@@ -17,43 +17,43 @@
 	NSString *name = nil;
 	NSString *value = nil;
 	MPURLRequestParameter *currentParameter = nil;
-	
+
 	while (![parameterScanner isAtEnd]) {
 		name = nil;
 		value = nil;
-		
+
 		[parameterScanner scanUpToString:@"=" intoString:&name];
 		[parameterScanner scanString:@"=" intoString:NULL];
 		[parameterScanner scanUpToString:@"&" intoString:&value];
-		[parameterScanner scanString:@"&" intoString:NULL];		
-		
+		[parameterScanner scanString:@"&" intoString:NULL];
+
 		currentParameter = [[MPURLRequestParameter alloc] init];
 		currentParameter.name = name;
 		currentParameter.value = [value stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-		
+
 		[foundParameters addObject:currentParameter];
-		
+
 		[currentParameter release];
 	}
-	
+
 	[parameterScanner release];
-	
+
 	return foundParameters;
 }
 
 + (NSArray *)parametersFromDictionary:(NSDictionary *)inDictionary {
 	NSMutableArray *parameterArray = [[NSMutableArray alloc] init];
 	MPURLRequestParameter *aURLParameter = nil;
-	
+
 	for (NSString *aKey in [inDictionary allKeys]) {
 		aURLParameter = [[MPURLRequestParameter alloc] init];
 		aURLParameter.name = aKey;
 		aURLParameter.value = [inDictionary objectForKey:aKey];
-		
+
 		[parameterArray addObject:aURLParameter];
 		[aURLParameter release];
 	}
-	
+
 	return [parameterArray autorelease];
 }
 
@@ -63,21 +63,21 @@
 		NSScanner *parameterScanner = [[NSScanner alloc] initWithString:inString];
 		NSString *name = nil;
 		NSString *value = nil;
-		
+
 		while (![parameterScanner isAtEnd]) {
 			name = nil;
 			value = nil;
-			
+
 			[parameterScanner scanUpToString:@"=" intoString:&name];
 			[parameterScanner scanString:@"=" intoString:NULL];
 			[parameterScanner scanUpToString:@"&" intoString:&value];
-			[parameterScanner scanString:@"&" intoString:NULL];		
-			
+			[parameterScanner scanString:@"&" intoString:NULL];
+
 			if (name && value) {
 				[foundParameters setObject:[value stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] forKey:name];
 			}
 		}
-		
+
 		[parameterScanner release];
 	}
 	return foundParameters;
@@ -86,25 +86,25 @@
 + (NSString *)parameterStringForParameters:(NSArray *)inParameters {
 	NSMutableString *queryString = [[NSMutableString alloc] init];
 	int i = 0;
-	int parameterCount = [inParameters count];	
+	int parameterCount = [inParameters count];
 	MPURLRequestParameter *aParameter = nil;
-	
+
 	for (; i < parameterCount; i++) {
 		aParameter = [inParameters objectAtIndex:i];
 		[queryString appendString:[aParameter URLEncodedParameterString]];
-		
+
 		if (i < parameterCount - 1) {
 			[queryString appendString:@"&"];
 		}
 	}
-	
+
 	return [queryString autorelease];
 }
 
 + (NSString *)parameterStringForDictionary:(NSDictionary *)inParameterDictionary {
 	NSArray *parameters = [self parametersFromDictionary:inParameterDictionary];
 	NSString *queryString = [self parameterStringForParameters:parameters];
-	
+
 	return queryString;
 }
 
@@ -112,7 +112,7 @@
 
 - (id)init {
 	if ((self = [super init])) {
-		
+
 	}
 	return self;
 }
@@ -128,7 +128,7 @@
 - (oneway void)dealloc {
 	self.name = nil;
 	self.value = nil;
-	
+
 	[super dealloc];
 }
 
@@ -145,11 +145,11 @@
 
 - (NSComparisonResult)compare:(id)inObject {
 	NSComparisonResult result = [self.name compare:[(MPURLRequestParameter *)inObject name]];
-	
+
 	if (result == NSOrderedSame) {
 		result = [self.value compare:[(MPURLRequestParameter *)inObject value]];
 	}
-								 
+
 	return result;
 }
 

@@ -33,12 +33,12 @@ NSString * const MPOAuthAccessTokenURLKey					= @"MPOAuthAccessTokenURL";
 		NSDictionary *configuration = inConfig;
 		Class methodClass = [[self class] _authorizationMethodClassForURL:inURL withConfiguration:&configuration];
 		[self release];
-		
+
 		self = [[methodClass alloc] initWithAPI:inAPI forURL:inURL withConfiguration:configuration];
 	} else if ((self = [super init])) {
-		self.oauthAPI = inAPI;		
+		self.oauthAPI = inAPI;
 	}
-	
+
 	return self;
 }
 
@@ -62,22 +62,22 @@ NSString * const MPOAuthAccessTokenURLKey					= @"MPOAuthAccessTokenURL";
 	Class methodClass = [MPOAuthAuthenticationMethodOAuth class];
 	NSString *oauthConfigPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"oauthAutoConfig" ofType:@"plist"];
 	NSDictionary *oauthConfigDictionary = [NSDictionary dictionaryWithContentsOfFile:oauthConfigPath];
-	
+
 	for ( NSString *domainString in [oauthConfigDictionary keyEnumerator]) {
 		if ([inBaseURL domainMatches:domainString]) {
 			NSDictionary *oauthConfig = [oauthConfigDictionary objectForKey:domainString];
-			
+
 			NSArray *requestedMethods = [oauthConfig objectForKey:@"MPOAuthAuthenticationPreferredMethods"];
 			NSString *requestedMethod = nil;
 			for (requestedMethod in requestedMethods) {
 				Class requestedMethodClass = NSClassFromString(requestedMethod);
-				
+
 				if (requestedMethodClass) {
 					methodClass = requestedMethodClass;
 				}
 				break;
 			}
-			
+
 			if (requestedMethod) {
 				*outConfig = [oauthConfig objectForKey:requestedMethod];
 			} else {
@@ -87,8 +87,8 @@ NSString * const MPOAuthAccessTokenURLKey					= @"MPOAuthAccessTokenURL";
 			break;
 		}
 	}
-	
-	return methodClass; 
+
+	return methodClass;
 }
 
 #pragma mark -
@@ -99,27 +99,27 @@ NSString * const MPOAuthAccessTokenURLKey					= @"MPOAuthAccessTokenURL";
 
 - (void)setTokenRefreshInterval:(NSTimeInterval)inTimeInterval {
 	if (!self.refreshTimer && inTimeInterval > 0.0) {
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:inTimeInterval target:self selector:@selector(_automaticallyRefreshAccessToken:) userInfo:nil repeats:YES];	
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:inTimeInterval target:self selector:@selector(_automaticallyRefreshAccessToken:) userInfo:nil repeats:YES];
 	}
 }
 
 - (void)refreshAccessToken {
 	MPURLRequestParameter *sessionHandleParameter = nil;
 	MPOAuthCredentialConcreteStore *credentials = (MPOAuthCredentialConcreteStore *)[self.oauthAPI credentials];
-	
+
 	if (credentials.sessionHandle) {
 		sessionHandleParameter = [[MPURLRequestParameter alloc] init];
 		sessionHandleParameter.name = @"oauth_session_handle";
 		sessionHandleParameter.value = credentials.sessionHandle;
 	}
-	
+
 	[self.oauthAPI performMethod:nil
 						   atURL:self.oauthGetAccessTokenURL
 				  withParameters:sessionHandleParameter ? [NSArray arrayWithObject:sessionHandleParameter] : nil
 					  withTarget:nil
 					   andAction:nil];
-	
-	[sessionHandleParameter release];	
+
+	[sessionHandleParameter release];
 }
 
 #pragma mark -

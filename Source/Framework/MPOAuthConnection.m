@@ -32,7 +32,7 @@
 	MPOAuthURLResponse *oauthResponse = [[[MPOAuthURLResponse alloc] init] autorelease];
 	oauthResponse.urlResponse = urlResponse;
 	*outResponse = oauthResponse;
-	
+
 	return responseData;
 }
 
@@ -47,7 +47,7 @@
 
 - (oneway void)dealloc {
 	[_credentials release];
-	
+
 	[super dealloc];
 }
 

@@ -13,14 +13,14 @@
 
 - (NSStringEncoding)encoding {
 	NSStringEncoding encoding = NSUTF8StringEncoding;
-	
+
 	if ([self textEncodingName]) {
 		CFStringEncoding cfStringEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef)[self textEncodingName]);
 		if (cfStringEncoding != kCFStringEncodingInvalidId) {
-			encoding = CFStringConvertEncodingToNSStringEncoding(cfStringEncoding); 
+			encoding = CFStringConvertEncodingToNSStringEncoding(cfStringEncoding);
 		}
 	}
-	
+
 	return encoding;
 }
 

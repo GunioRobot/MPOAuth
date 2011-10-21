@@ -29,7 +29,7 @@
 
 - (id)init {
 	if ((self = [super init])) {
-		
+
 	}
 	return self;
 }
@@ -40,7 +40,7 @@
 	self.connection = nil;
 	self.response = nil;
 	self.responseData = nil;
-	
+
 	[super dealloc];
 }
 
@@ -64,7 +64,7 @@
 - (BOOL)_processResponseSearchingForLinkMarkup {
 	BOOL foundMatchingLink = NO;
 	//TODO: Determe if type is html derivative and use libxml to derive the link elements from it
-	
+
 	return foundMatchingLink;
 }
 
@@ -76,41 +76,41 @@
 	NSString *foundLink = nil;
 	NSString *foundLinkRel = nil;
 	NSString *foundLinkType = nil;
-	
+
 	while (![linkScanner isAtEnd]) {
 		[linkScanner scanUpToString:@"<" intoString:NULL];
 		[linkScanner scanUpToString:@">" intoString:&foundLink];
 		[linkScanner scanString:@">" intoString:NULL];
-		
+
 		[linkScanner scanString:@"; " intoString:NULL];
 		[linkScanner scanString:@"rel=\"" intoString:NULL];
 		[linkScanner scanUpToString:@"\"" intoString:&foundLinkRel];
 		[linkScanner scanString:@"\"" intoString:NULL];
 		[linkScanner scanString:@"; " intoString:NULL];
-		
+
 		[linkScanner scanString:@"type=\"" intoString:NULL];
 		[linkScanner scanUpToString:@"\"" intoString:&foundLinkType];
 		[linkScanner scanString:@"\"" intoString:NULL];
-		
+
 		if ([foundLinkRel rangeOfString:kMPWSLRDDiscovererExpectedRelType].location != NSNotFound &&
 			[foundLinkType isEqualToString:self.soughtType]) {
 			NSURL *foundURL = [NSURL URLWithString:foundLink];
 			[self _foundResourceURL:foundURL forType:self.soughtType];
 			foundMatchingLink = YES;
 		}
-		
+
 		if (![linkScanner isAtEnd]) {
 			[linkScanner scanString:@";" intoString:NULL];
 		}
 	}
-	
+
 	return foundMatchingLink;
 }
 
 - (BOOL)_ignoreResponseAndLookupHostMeta {
 	BOOL foundMatchingLink = NO;
 	//TODO: Parse host-meta link templates
-	
+
 	return foundMatchingLink;
 }
 

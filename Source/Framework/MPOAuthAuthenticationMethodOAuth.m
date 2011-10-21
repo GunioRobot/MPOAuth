@@ -45,22 +45,22 @@ NSString * const MPOAuthCredentialVerifierKey				= @"oauth_verifier";
 
 - (id)initWithAPI:(MPOAuthAPI *)inAPI forURL:(NSURL *)inURL withConfiguration:(NSDictionary *)inConfig {
 	if ((self = [super initWithAPI:inAPI forURL:inURL withConfiguration:inConfig])) {
-		
+
 		NSAssert( [inConfig count] >= 3, @"Incorrect number of oauth authorization methods");
 		self.oauthRequestTokenURL = [NSURL URLWithString:[inConfig objectForKey:MPOAuthRequestTokenURLKey]];
 		self.oauthAuthorizeTokenURL = [NSURL URLWithString:[inConfig objectForKey:MPOAuthUserAuthorizationURLKey]];
-		self.oauthGetAccessTokenURL = [NSURL URLWithString:[inConfig objectForKey:MPOAuthAccessTokenURLKey]];		
-		
+		self.oauthGetAccessTokenURL = [NSURL URLWithString:[inConfig objectForKey:MPOAuthAccessTokenURLKey]];
+
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_requestTokenReceived:) name:MPOAuthNotificationRequestTokenReceived object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_requestTokenRejected:) name:MPOAuthNotificationRequestTokenRejected object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_accessTokenReceived:) name:MPOAuthNotificationAccessTokenReceived object:nil];		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_accessTokenReceived:) name:MPOAuthNotificationAccessTokenReceived object:nil];
 	}
 	return self;
 }
 
 - (oneway void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
+
 	self.oauthRequestTokenURL = nil;
 	self.oauthAuthorizeTokenURL = nil;
 
@@ -76,7 +76,7 @@ NSString * const MPOAuthCredentialVerifierKey				= @"oauth_verifier";
 
 - (void)authenticate {
 	id <MPOAuthCredentialStore> credentials = [self.oauthAPI credentials];
-	
+
 	if (!credentials.accessToken && !credentials.requestToken) {
 		[self _authenticationRequestForRequestToken];
 	} else if (!credentials.accessToken) {
@@ -84,17 +84,17 @@ NSString * const MPOAuthCredentialVerifierKey				= @"oauth_verifier";
 	} else if (credentials.accessToken && [[NSUserDefaults standardUserDefaults] objectForKey:MPOAuthTokenRefreshDateDefaultsKey]) {
 		NSTimeInterval expiryDateInterval = [[NSUserDefaults standardUserDefaults] doubleForKey:MPOAuthTokenRefreshDateDefaultsKey];
 		NSDate *tokenExpiryDate = [NSDate dateWithTimeIntervalSinceReferenceDate:expiryDateInterval];
-			
+
 		if ([tokenExpiryDate compare:[NSDate date]] == NSOrderedAscending) {
 			[self refreshAccessToken];
 		}
-	}	
+	}
 }
 
 - (void)_authenticationRequestForRequestToken {
 	if (self.oauthRequestTokenURL) {
 		MPLog(@"--> Performing Request Token Request: %@", self.oauthRequestTokenURL);
-		
+
 		// Append the oauth_callbackUrl parameter for requesting the request token
 		MPURLRequestParameter *callbackParameter = nil;
 		if (self.delegate && [self.delegate respondsToSelector: @selector(callbackURLForCompletedUserAuthorization)]) {
@@ -104,7 +104,7 @@ NSString * const MPOAuthCredentialVerifierKey				= @"oauth_verifier";
 			// oob = "Out of bounds"
 			callbackParameter = [[[MPURLRequestParameter alloc] initWithName:@"oauth_callback" andValue:@"oob"] autorelease];
 		}
-		
+
 		NSArray *params = [NSArray arrayWithObject:callbackParameter];
 		[self.oauthAPI performMethod:nil atURL:self.oauthRequestTokenURL withParameters:params withTarget:self andAction:@selector(_authenticationRequestForRequestTokenSuccessfulLoad:withData:)];
 	}
@@ -115,18 +115,18 @@ NSString * const MPOAuthCredentialVerifierKey				= @"oauth_verifier";
 	NSString *xoauthRequestAuthURL = [oauthResponseParameters objectForKey:@"xoauth_request_auth_url"]; // a common custom extension, used by Yahoo!
 	NSURL *userAuthURL = xoauthRequestAuthURL ? [NSURL URLWithString:xoauthRequestAuthURL] : self.oauthAuthorizeTokenURL;
 	NSURL *callbackURL = nil;
-	
+
 	if (!self.oauth10aModeActive) {
 		callbackURL = [self.delegate respondsToSelector:@selector(callbackURLForCompletedUserAuthorization)] ? [self.delegate callbackURLForCompletedUserAuthorization] : nil;
 	}
-	
+
 	NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:	[oauthResponseParameters objectForKey:	@"oauth_token"], @"oauth_token",
 																													callbackURL, @"oauth_callback",
 																													nil];
-																						
+
 	userAuthURL = [userAuthURL urlByAddingParameterDictionary:parameters];
 	BOOL delegateWantsToBeInvolved = [self.delegate respondsToSelector:@selector(automaticallyRequestAuthenticationFromURL:withCallbackURL:)];
-	
+
 	if (!delegateWantsToBeInvolved || (delegateWantsToBeInvolved && [self.delegate automaticallyRequestAuthenticationFromURL:userAuthURL withCallbackURL:callbackURL])) {
 		MPLog(@"--> Automatically Performing User Auth Request: %@", userAuthURL);
 		[self _authenticationRequestForUserPermissionsConfirmationAtURL:userAuthURL];
@@ -149,7 +149,7 @@ NSString * const MPOAuthCredentialVerifierKey				= @"oauth_verifier";
 
 - (void)_authenticationRequestForAccessToken {
 	NSArray *params = nil;
-	
+
 	if (self.delegate && [self.delegate respondsToSelector: @selector(oauthVerifierForCompletedUserAuthorization)]) {
 		MPURLRequestParameter *verifierParameter = nil;
 
@@ -159,7 +159,7 @@ NSString * const MPOAuthCredentialVerifierKey				= @"oauth_verifier";
 			params = [NSArray arrayWithObject:verifierParameter];
 		}
 	}
-	
+
 	if (self.oauthGetAccessTokenURL) {
 		MPLog(@"--> Performing Access Token Request: %@", self.oauthGetAccessTokenURL);
 		[self.oauthAPI performMethod:nil atURL:self.oauthGetAccessTokenURL withParameters:params withTarget:self andAction:nil];
@@ -172,7 +172,7 @@ NSString * const MPOAuthCredentialVerifierKey				= @"oauth_verifier";
 	if ([[inNotification userInfo] objectForKey:@"oauth_callback_confirmed"]) {
 		self.oauth10aModeActive = YES;
 	}
-	
+
 	[self.oauthAPI setCredential:[[inNotification userInfo] objectForKey:@"oauth_token"] withName:kMPOAuthCredentialRequestToken];
 	[self.oauthAPI setCredential:[[inNotification userInfo] objectForKey:@"oauth_token_secret"] withName:kMPOAuthCredentialRequestTokenSecret];
 }
@@ -185,21 +185,21 @@ NSString * const MPOAuthCredentialVerifierKey				= @"oauth_verifier";
 - (void)_accessTokenReceived:(NSNotification *)inNotification {
 	[self.oauthAPI removeCredentialNamed:MPOAuthCredentialRequestTokenKey];
 	[self.oauthAPI removeCredentialNamed:MPOAuthCredentialRequestTokenSecretKey];
-	
+
 	[self.oauthAPI setCredential:[[inNotification userInfo] objectForKey:@"oauth_token"] withName:kMPOAuthCredentialAccessToken];
 	[self.oauthAPI setCredential:[[inNotification userInfo] objectForKey:@"oauth_token_secret"] withName:kMPOAuthCredentialAccessTokenSecret];
-	
+
 	if ([[inNotification userInfo] objectForKey:MPOAuthCredentialSessionHandleKey]) {
 		[self.oauthAPI setCredential:[[inNotification userInfo] objectForKey:MPOAuthCredentialSessionHandleKey] withName:kMPOAuthCredentialSessionHandle];
 	}
 
 	[self.oauthAPI setAuthenticationState:MPOAuthAuthenticationStateAuthenticated];
-	
+
 	if ([[inNotification userInfo] objectForKey:@"oauth_expires_in"]) {
 		NSTimeInterval tokenRefreshInterval = (NSTimeInterval)[[[inNotification userInfo] objectForKey:@"oauth_expires_in"] intValue];
 		NSDate *tokenExpiryDate = [NSDate dateWithTimeIntervalSinceNow:tokenRefreshInterval];
 		[[NSUserDefaults standardUserDefaults] setDouble:[tokenExpiryDate timeIntervalSinceReferenceDate] forKey:MPOAuthTokenRefreshDateDefaultsKey];
-	
+
 		if (tokenRefreshInterval > 0.0) {
 			[self setTokenRefreshInterval:tokenRefreshInterval];
 		}

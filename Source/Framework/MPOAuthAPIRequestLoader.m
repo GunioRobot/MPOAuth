@@ -77,7 +77,7 @@ NSString * const MPOAuthNotificationErrorHasOccurred		= @"MPOAuthNotificationErr
 	if (!_oauthResponse) {
 		_oauthResponse = [[MPOAuthURLResponse alloc] init];
 	}
-	
+
 	return _oauthResponse;
 }
 
@@ -85,14 +85,14 @@ NSString * const MPOAuthNotificationErrorHasOccurred		= @"MPOAuthNotificationErr
 	if (!_dataAsString) {
 		_dataAsString = [[NSString alloc] initWithData:self.data encoding:[self.oauthResponse.urlResponse encoding]];
 	}
-	
+
 	return _dataAsString;
 }
 
 - (void)loadSynchronously:(BOOL)inSynchronous {
 	NSAssert(_credentials, @"Unable to load without valid credentials");
 	NSAssert(_credentials.consumerKey, @"Unable to load, credentials contain no consumer key");
-	
+
 	if (!inSynchronous) {
 		[MPOAuthConnection connectionWithRequest:self.oauthRequest delegate:self credentials:self.credentials];
 	} else {
@@ -131,7 +131,7 @@ NSString * const MPOAuthNotificationErrorHasOccurred		= @"MPOAuthNotificationErr
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	[self _interrogateResponseForOAuthData];
-	
+
 	if (_action) {
 		if ([_target conformsToProtocol:@protocol(MPOAuthAPIInternalClient)]) {
 			[_target performSelector:_action withObject:self withObject:self.data];
@@ -147,21 +147,21 @@ NSString * const MPOAuthNotificationErrorHasOccurred		= @"MPOAuthNotificationErr
 	NSString *response = self.responseString;
 	NSDictionary *foundParameters = nil;
 	NSInteger status = [(NSHTTPURLResponse *)[self.oauthResponse urlResponse] statusCode];
-	
+
 	if ([response length] > 5 && [[response substringToIndex:5] isEqualToString:@"oauth"]) {
 		foundParameters = [MPURLRequestParameter parameterDictionaryFromString:response];
 		self.oauthResponse.oauthParameters = foundParameters;
-		
+
 		if (status == 401 || [foundParameters objectForKey:@"oauth_problem"]) {
 			NSString *aParameterValue = nil;
 			MPLog(@"oauthProblem = %@", foundParameters);
-			
+
 			if ([foundParameters count] && (aParameterValue = [foundParameters objectForKey:@"oauth_problem"])) {
 				if ([aParameterValue isEqualToString:@"token_rejected"]) {
 					if (self.credentials.requestToken && !self.credentials.accessToken) {
 						[_credentials setRequestToken:nil];
 						[_credentials setRequestTokenSecret:nil];
-						
+
 						[[NSNotificationCenter defaultCenter] postNotificationName:MPOAuthNotificationRequestTokenRejected
 																			object:nil
 																		  userInfo:foundParameters];
@@ -171,10 +171,10 @@ NSString * const MPOAuthNotificationErrorHasOccurred		= @"MPOAuthNotificationErr
 						[[NSNotificationCenter defaultCenter] postNotificationName:MPOAuthNotificationAccessTokenRejected
 																			object:nil
 																		  userInfo:foundParameters];
-						
-					}						
+
+					}
 				}
-				
+
 				// something's messed up, so throw an error
 				[[NSNotificationCenter defaultCenter] postNotificationName:MPOAuthNotificationErrorHasOccurred
 																	object:nil
@@ -188,26 +188,26 @@ NSString * const MPOAuthNotificationErrorHasOccurred		= @"MPOAuthNotificationErr
 				if (!self.credentials.requestToken && !self.credentials.accessToken) {
 					[_credentials setRequestToken:aParameterValue];
 					[_credentials setRequestTokenSecret:[foundParameters objectForKey:@"oauth_token_secret"]];
-					
+
 					[[NSNotificationCenter defaultCenter] postNotificationName:MPOAuthNotificationRequestTokenReceived
 																		object:nil
 																	  userInfo:foundParameters];
-					
+
 				} else if (!self.credentials.accessToken && self.credentials.requestToken) {
 					[_credentials setRequestToken:nil];
 					[_credentials setRequestTokenSecret:nil];
 					[_credentials setAccessToken:aParameterValue];
 					[_credentials setAccessTokenSecret:[foundParameters objectForKey:@"oauth_token_secret"]];
-					
+
 					[[NSNotificationCenter defaultCenter] postNotificationName:MPOAuthNotificationAccessTokenReceived
 																		object:nil
 																	  userInfo:foundParameters];
-					
+
 				} else if (self.credentials.accessToken && !self.credentials.requestToken) {
 					// replace the current token
 					[_credentials setAccessToken:aParameterValue];
 					[_credentials setAccessTokenSecret:[foundParameters objectForKey:@"oauth_token_secret"]];
-					
+
 					[[NSNotificationCenter defaultCenter] postNotificationName:MPOAuthNotificationAccessTokenRefreshed
 																		object:nil
 																	  userInfo:foundParameters];

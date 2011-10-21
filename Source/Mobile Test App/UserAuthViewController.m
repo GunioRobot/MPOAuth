@@ -18,13 +18,13 @@
 		self.navigationItem.prompt = @"Request Authorization for this application";
 		self.userAuthURL = inURL;
 	}
-	
+
 	return self;
 }
 
 - (void)dealloc {
 	self.userAuthURL = nil;
-	
+
     [super dealloc];
 }
 
@@ -55,7 +55,7 @@
 		[[self navigationController] popViewControllerAnimated:YES];
 		return NO;
 	}
-	
+
 	return YES;
 }
 

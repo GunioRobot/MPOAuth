@@ -11,7 +11,7 @@
 @implementation OAuthClientController
 
 - (id)init {
-	if ((self = [super init])) {		
+	if ((self = [super init])) {
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestTokenReceived:) name:MPOAuthNotificationRequestTokenReceived object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(accessTokenReceived:) name:MPOAuthNotificationAccessTokenReceived object:nil];
 	}
@@ -20,7 +20,7 @@
 
 - (oneway void)dealloc {
 	[_oauthAPI release];
-	
+
 	[super dealloc];
 }
 
@@ -48,7 +48,7 @@
 																				nil];
 		_oauthAPI = [[MPOAuthAPI alloc] initWithCredentials:credentials
 										  authenticationURL:[NSURL URLWithString:[authenticationURLField stringValue]]
-												 andBaseURL:[NSURL URLWithString:[baseURLField stringValue]]];		
+												 andBaseURL:[NSURL URLWithString:[baseURLField stringValue]]];
 	} else {
 		[_oauthAPI authenticate];
 	}

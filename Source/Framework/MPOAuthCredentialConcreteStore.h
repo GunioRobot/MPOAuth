@@ -34,6 +34,6 @@
 
 - (void)setCredential:(id)inCredential withName:(NSString *)inName;
 - (void)removeCredentialNamed:(NSString *)inName;
-	
+
 
 @end

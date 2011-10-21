@@ -30,17 +30,17 @@
 																								[NSNumber numberWithUnsignedLongLong:'oaut'], kSecAttrType,
 																								[inValue dataUsingEncoding:NSUTF8StringEncoding], kSecValueData,
 													 nil];
-	
-	
+
+
 	if ([self findValueFromKeychainUsingName:inName returningItem:&searchDictionary]) {
 		NSMutableDictionary *updateDictionary = [keychainItemAttributeDictionary mutableCopy];
 		[updateDictionary removeObjectForKey:(id)kSecClass];
-		
+
 		SecItemUpdate((CFDictionaryRef)keychainItemAttributeDictionary, (CFDictionaryRef)updateDictionary);
 		[updateDictionary release];
 	} else {
 		OSStatus success = SecItemAdd( (CFDictionaryRef)keychainItemAttributeDictionary, NULL);
-		
+
 		if (success == errSecNotAvailable) {
 			[NSException raise:@"Keychain Not Available" format:@"Keychain Access Not Currently Available"];
 		} else if (success == errSecDuplicateItem) {
@@ -61,7 +61,7 @@
 	NSData *foundValue = nil;
 	OSStatus status = noErr;
 //	NSString *itemID = [NSString stringWithFormat:@"%@.oauth.%@", [[NSBundle mainBundle] bundleIdentifier], inName];
-	
+
 	NSMutableDictionary *searchDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:(id)kSecClassInternetPassword, (id)kSecClass,
 																							  securityDomain, (id)kSecAttrSecurityDomain,
 																							  serverName, (id)kSecAttrServer,
@@ -72,16 +72,16 @@
 																							  (id)kCFBooleanTrue, (id)kSecReturnPersistentRef,
 											 nil];
 
-	status = SecItemCopyMatching((CFDictionaryRef)searchDictionary, (CFTypeRef *)&attributesDictionary);		
+	status = SecItemCopyMatching((CFDictionaryRef)searchDictionary, (CFTypeRef *)&attributesDictionary);
 	foundValue = [attributesDictionary objectForKey:(id)kSecValueData];
 	if (outKeychainItemRef) {
 		*outKeychainItemRef = attributesDictionary;
 	}
-	
+
 	if (status == noErr && foundValue) {
 		foundPassword = [[NSString alloc] initWithData:foundValue encoding:NSUTF8StringEncoding];
 	}
-	
+
 	return [foundPassword autorelease];
 }
 
@@ -94,7 +94,7 @@
 																								 serverName, (id)kSecAttrServer,
 																								 inName, (id)kSecAttrAccount,
 																								 nil];
-	
+
 	OSStatus success = SecItemDelete((CFDictionaryRef)searchDictionary);
 
 	if (success == errSecNotAvailable) {
@@ -102,9 +102,9 @@
 	} else if (success == errSecParam) {
 		[NSException raise:@"Keychain parameter error" format:@"One or more parameters passed to the function were not valid from %@", searchDictionary];
 	} else if (success == errSecAllocate) {
-		[NSException raise:@"Keychain memory error" format:@"Failed to allocate memory"];			
+		[NSException raise:@"Keychain memory error" format:@"Failed to allocate memory"];
 	}
-		
+
 }
 
 @end
